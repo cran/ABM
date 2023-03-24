@@ -23,13 +23,17 @@ Agent <- R6::R6Class(
 #' @param agent can be either an external pointer to an agent such as one
 #' returned by newAgent, or a list representing the initial state for creating
 #' a new agent, or NULL (an empty state)
-    initialize = function(agent=NULL) {
+#' @param death.time the time of death for the agent, a numeric value
+#' 
+#' @details Note that specifying death.time is equivalent to call the 
+#' ```$setDeathTime``` method.
+    initialize = function(agent=NULL, death.time=NA) {
       if (typeof(agent) == "externalptr") {
         private$agent = agent
       } else {
         if (!is.null(agent) && !is.list(agent))
           agent = list(agent)
-        private$agent = newAgent(agent)
+        private$agent = newAgent(agent, death.time)
       }
     },
     
@@ -66,6 +70,27 @@ Agent <- R6::R6Class(
         event = event$get
       unschedule(private$agent, event)
       return(self)
+    },
+
+#' leave the population that the agent is in
+#' 
+#' @return the agent itself
+    leave = function() {
+      leave(private$agent)
+      return(self)
+    },
+
+#' set the time of death for the agent
+#' 
+#' @param time the time of death, a numeric value
+#' 
+#' @return the agent itself
+#' 
+#' @details At the time of death, the agent is removed from the simulation. 
+#' Calling it multiple times causes the agent to die at the earliest time.
+    setDeathTime = function(time) {
+      setDeathTime(private$agent, time)
+      self
     }
   ),
   private = list(
@@ -90,7 +115,7 @@ Agent <- R6::R6Class(
 #' 
 #' Get the external pointer for the agent
     get = function() { private$agent }
-  )
+  ),
 )
 
 #' Create an agent with a given state
@@ -100,7 +125,12 @@ Agent <- R6::R6Class(
 #' @param state a list giving the initial state of the agent, or NULL (an empty 
 #' list)
 #' 
+#' @param death_time the death time for the agent, an optional numeric value.
+#' 
 #' @return an external pointer pointing to the agent
+#' 
+#' @details Setting death_time is equivalent to calling the [setDeathTime()]
+#' function.
 #' 
 #' @export
 NULL
@@ -113,12 +143,12 @@ NULL
 #' 
 #' @return an integer value
 #' 
-#' @details before an agent is added to a population, its id is 0
-#' after it is added, its id is the index in the population 
+#' @details Before an agent is added to a population, its id is 0.
+#' After it is added, its id is the index in the population 
 #' (starting from 1).
 #' 
-#' If agent is an R6 object, then we should either use agent$schedule, 
-#' or use schedule(agent$get, event)
+#' If agent is an R6 object, then we should either use ```agent$id```, 
+#' or use ```getID(agent$get)```
 #' 
 #' @export
 NULL
@@ -143,7 +173,7 @@ NULL
 #' 
 #' @param agent an external pointer returned by newAgent
 #' 
-#' @param state an R list giveng the components of the state to be
+#' @param state an R list giving the components of the state to be
 #' undated.
 #' 
 #' @return the agent itself
@@ -244,6 +274,39 @@ NULL
 #' 
 #' @details If agent is an R6 object, then we should use either
 #' agent$clearEvents() or clearEvents(agent$get)
+#' 
+#' @export
+NULL
+
+#' leave the population that the agent is in
+#' 
+#' @name leave
+#' 
+#' @param agent an external pointer returned by newAgent
+#' 
+#' @return the agent itself
+#' 
+#' @details If agent is an R6 object, then we should use either
+#' agent$leave() or leave(agent$get)
+#' 
+#' @export
+NULL
+
+#' set the time of death for an agent
+#' 
+#' @name setDeathTime
+#' 
+#' @param agent an external pointer returned by [newAgent()] or [getAgent()]
+#' 
+#' @param time the time of death, a numeric value
+#' 
+#' @return the agent itself
+#' 
+#' @details If agent is an R6 object, then we should use either
+#' agent$leave() or leave(agent$get)
+#' 
+#' At the time of death, the agent is removed from the simulation. Calling it 
+#' multiple times causes the agent to die at the earliest time.
 #' 
 #' @export
 NULL

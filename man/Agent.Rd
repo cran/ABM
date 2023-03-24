@@ -18,6 +18,13 @@ state change.
 
 An agent itself cannot handle the event. Instead, it has to be added to a
 simulation (or a population that itself is added to a simulation).
+
+Note that specifying death.time is equivalent to call the
+\verb{$setDeathTime} method.
+Check if the state of the agent matches a given state
+
+At the time of death, the agent is removed from the simulation.
+Calling it multiple times causes the agent to die at the earliest time.
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
@@ -37,6 +44,8 @@ simulation (or a population that itself is added to a simulation).
 \item \href{#method-R6Agent-match}{\code{Agent$match()}}
 \item \href{#method-R6Agent-schedule}{\code{Agent$schedule()}}
 \item \href{#method-R6Agent-unschedule}{\code{Agent$unschedule()}}
+\item \href{#method-R6Agent-leave}{\code{Agent$leave()}}
+\item \href{#method-R6Agent-setDeathTime}{\code{Agent$setDeathTime()}}
 \item \href{#method-R6Agent-clone}{\code{Agent$clone()}}
 }
 }
@@ -45,7 +54,7 @@ simulation (or a population that itself is added to a simulation).
 \if{latex}{\out{\hypertarget{method-R6Agent-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$new(agent = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$new(agent = NULL, death.time = NA)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -53,8 +62,9 @@ simulation (or a population that itself is added to a simulation).
 \describe{
 \item{\code{agent}}{can be either an external pointer to an agent such as one
 returned by newAgent, or a list representing the initial state for creating
-a new agent, or NULL (an empty state)
-Check if the state of the agent matches a given state}
+a new agent, or NULL (an empty state)}
+
+\item{\code{death.time}}{the time of death for the agent, a numeric value}
 }
 \if{html}{\out{</div>}}
 }
@@ -113,6 +123,39 @@ Unschedule an event
 \describe{
 \item{\code{event}}{an object of the R6 class Event, or an external pointer
 returned by newEvent}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+the agent itself
+leave the population that the agent is in
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-R6Agent-leave"></a>}}
+\if{latex}{\out{\hypertarget{method-R6Agent-leave}{}}}
+\subsection{Method \code{leave()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$leave()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+the agent itself
+set the time of death for the agent
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-R6Agent-setDeathTime"></a>}}
+\if{latex}{\out{\hypertarget{method-R6Agent-setDeathTime}{}}}
+\subsection{Method \code{setDeathTime()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$setDeathTime(time)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{time}}{the time of death, a numeric value}
 }
 \if{html}{\out{</div>}}
 }

@@ -30,14 +30,27 @@ RandomMixing::RandomMixing()
 const std::vector<PAgent> &RandomMixing::contact(double time, Agent &agent)
 {
   size_t n = _population->size();
-  size_t id = agent.id() - 1;
-  size_t i = unif.get() * (n-1);
-  size_t j = (i >= id) ? i + 1 : i;
-  _neighbors[0] = _population->agent(j);
+  if (n <= 1)
+    _neighbors.resize(0);
+  else {
+    size_t id = agent.id();
+    while (true) {
+      size_t i = unif.get() * n;
+      auto c = _population->agentAtIndex(i);
+      if (c->id() != id) {
+        _neighbors[0] = c;
+        break;
+      }
+    }
+  }
   return _neighbors;
 }
 
 void RandomMixing::add(const PAgent &agent)
+{
+}
+
+void RandomMixing::remove(Agent &agent)
 {
 }
 
@@ -49,7 +62,8 @@ RContact::RContact(Environment r6)
   : Contact(), _r6(r6), 
     _r6_contact(r6["contact"]),
     _r6_addAgent(r6["addAgent"]),
-    _r6_attach(r6["attach"])
+    _r6_attach(r6["attach"]),
+    _r6_remove(r6["remove"])
 {
 }
 
@@ -74,6 +88,12 @@ void RContact::build()
 {
   _r6_attach(XP<Population>(*_population));
 }
+
+void RContact::remove(Agent &agent)
+{
+  _r6_remove(XP<Agent>(agent));
+}
+
 
 CharacterVector Contact::classes = CharacterVector::create("Contact");
 

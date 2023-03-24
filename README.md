@@ -6,8 +6,15 @@ In addition, this framework is a general event-based framework.  Yet this framew
 
 # Installation
 
-This R package can be installed using the devtoools::install_github method:
+## From CRAN
+This R package is included in CRAN.  
+```r
+install.packages("ABM")
 ```
+
+## From GitHub
+For the latest development version, use the devtoools::install_github method:
+```r
 install_github("https://github.com/junlingm/ABM.git")
 ```
 
@@ -21,4 +28,6 @@ See more information on the [Wiki](https://github.com/junlingm/ABM/wiki/)
   3. [Simulate a multi-group SEIR model](https://github.com/junlingm/ABM/wiki/Agent-Multigroup)
   4. [Simulate a contact network SIR model](https://github.com/junlingm/ABM/wiki/Agent-Network-SIR)
   5. [Simulate contact tracing on an SIR model](https://github.com/junlingm/ABM/wiki/Contact-Tracing-SIR)
+  6. [Simulate a household SEIR model](https://github.com/junlingm/ABM/wiki/Household-SEIR)
+  7. [An SIR model with births and deaths](https://github.com/junlingm/ABM/wiki/SIR-Births-Deaths)
 

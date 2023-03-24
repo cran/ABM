@@ -5,6 +5,7 @@
 #include <map>
 
 class Population;
+class ContactTransition;
 
 /**
  * The class is an abstraction of an agent. The key task of an agent is to
@@ -21,7 +22,7 @@ class Population;
  * An agent itself cannot handle the event. Instead, it has to be added to a
  * simulation (or a population that itself is added to a simulation).
  */
-class Agent : public Event {
+class Agent : public Calendar {
 public:
   /**
    * Constructor that creates an agent with a given state
@@ -30,15 +31,12 @@ public:
    * (giving an empty state).
    */
   Agent(Rcpp::Nullable<Rcpp::List> state = R_NilValue);
-  /**
-   * Destructor
-   */
-  virtual ~Agent();
 
   /**
    * Returns the agent id (a long value)
    */
   unsigned long id() const { return _id; }
+
   /**
    * Handle the agent as an event
    * 
@@ -57,27 +55,6 @@ public:
    * called by the Simulation class.
    */
   virtual bool handle(Simulation &sim, Agent &agent);
-  /**
-   * Schedules an event
-   * 
-   * @param a shared_ptr<Event> object that points the event to be scheduled
-   */
-  virtual void schedule(PEvent event);
-
-  /**
-   * Remove a scheduled event
-   * 
-   * @param a shared_ptr<Event> object that points to the event to be removed.
-   * 
-   * @details The event must be scheduled by the agent, otherwise 
-   * the call returns without any action.
-   */
-  virtual void unschedule(PEvent event);
-
-  /**
-   * unschedule all events scheduled to an agent
-   */
-  void clearEvents();
 
   /**
    * Set the state of the agent
@@ -102,7 +79,27 @@ public:
    * Reports the state to the population the agent is in.
    */
   virtual void report();
+
+  /**
+   * remove the agent from the population it was in.
+   * 
+   * @details after calling this function, the agent is not in any population
+   */
+  virtual void leave();
   
+  /**
+   * set the time of death for the agent
+   * 
+   * @param time the time of death
+   * 
+   * @details at the given time the agent is removed from the simulation 
+   */
+  void setDeathTime(double time);
+
+  /** the population that it is in */
+  Population *population() { return _population; }
+  const Population *population() const { return _population; }
+
   static Rcpp::CharacterVector classes;
 
 protected:
@@ -120,16 +117,17 @@ protected:
 
 private:
   friend class Population;
+  friend class ContactTransition;
   /**
    * The agent id, i.e., the order in the population
    */
   unsigned long _id;
   /**
-   * Ordered events
-   */
-  std::multimap<double, PEvent> _events;
-  /**
    * The state of the agent
    */
   State _state;
+  /**
+   * A calendar holding all the transition events 
+   */
+  PCalendar _contactEvents;
 };

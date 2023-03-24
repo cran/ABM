@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <set>
 #include <utility>
 #include <Rcpp.h>
 
@@ -64,6 +65,16 @@ public:
   void add(PAgent agent);
   
   /**
+   * remove an agent to the populaton
+   * 
+   * @param agent the agent to be removed
+   * 
+   * @details The agent is unscheduled from the population, and all its contact
+   * patterns
+   */
+  void remove(Agent &agent);
+  
+  /**
    * Add a contact pattern
    * 
    * @param contact A shared_pre<Contact> pointing to a Contact object.
@@ -78,7 +89,8 @@ public:
    * 
    * It is the number of agents in the population.
    */
-  size_t size() const { return _agents.size(); }
+  size_t size() const { return _agents.size() - _available.size(); }
+
   /**
    * return a specific agent by index
    * 
@@ -86,8 +98,17 @@ public:
    * 
    * @return a shared_ptr<Agent> pointing to the agent requested.
    */
-  PAgent agent(size_t i) const { return _agents[i]; }
-
+  PAgent agentAtIndex(size_t i) const;
+  
+  /**
+   * return a specific agent by ID
+   * 
+   * @param i the index of the agent (starting from 1)
+   * 
+   * @return a shared_ptr<Agent> pointing to the agent requested.
+   */
+  PAgent agentByID(size_t id) const { return _agents[id - 1]; }
+  
   /**
    * Initialize the state of agents in the population using an 
    * initializer function
@@ -124,6 +145,15 @@ protected:
    * A list of shared_ptr<Contact> pointing to the contacts
    */
   std::list<PContact> _contacts;
+  
+private:
+  /**
+   * Available ids to be reused.
+   * 
+   * These are the ids that were used by an agent who have been removed from
+   * the population
+   */
+  std::set<size_t> _available;
 };
 
 typedef std::shared_ptr<Population> PPopulation;

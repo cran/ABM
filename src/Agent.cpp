@@ -4,26 +4,26 @@
 
 using namespace Rcpp;
 
+class DeathEvent : public Event {
+public:
+  DeathEvent(double time) : Event(time) { }
+  virtual bool handle(Simulation & sim, Agent &agent) {
+    agent.leave();
+    return false;
+  }
+};
+
 Agent::Agent(Nullable<List> state)
-  : Event(R_PosInf), _population(nullptr)
+  : Calendar(), _population(nullptr), _contactEvents(new Calendar)
 {
   if (state != R_NilValue) _state &= state.as();
-}
-
-Agent::~Agent()
-{
+  schedule(_contactEvents);
 }
 
 bool Agent::handle(Simulation &sim, Agent &agent)
 {
-  if (!_events.empty()) {
-    auto e = _events.begin()->second;
-    unschedule(e);
-    if (e->handle(sim, *this)) {
-      schedule(e);
-    }
-  }
-  return true;
+  Calendar::handle(sim, *this);
+  return _population != nullptr;
 }
 
 void Agent::set(const Rcpp::List &state)
@@ -44,55 +44,20 @@ void Agent::stateChanged(Agent &agent, const State &from)
     _population->stateChanged(agent, from);
 }
 
-void Agent::schedule(PEvent event)
+void Agent::leave()
 {
-  if (event->_owner != nullptr)
-    event->_owner->unschedule(event);
-  double t = event->time();
-  bool update = _time > t;
-  if (update) _time = t;
-  Agent *owner = update ? _owner : nullptr;
-  PEvent me;
-  if (owner != nullptr) {
-    me = _pos->second;
-    owner->unschedule(me);
+  if (_population != nullptr) {
+    State save = _state;
+    _state = State();
+    stateChanged(*this, save);
+    _population->remove(*this);
+    _state = save;
   }
-  event->_owner = this;
-  event->_pos = _events.emplace(t, event);
-  if (owner != nullptr)
-    owner->schedule(me);
 }
 
-void Agent::unschedule(PEvent event)
+void Agent::setDeathTime(double time)
 {
-  if (event == NULL || event->_owner != this) return;
-  Agent *owner = (_time == event->time()) ? _owner : nullptr;
-  PEvent me;
-  if (owner != nullptr) {
-    me = _pos->second;
-    owner->unschedule(me);
-  }
-  _events.erase(event->_pos);
-  event->_owner = nullptr;
-  _time = _events.empty() ? R_PosInf : _events.begin()->first;
-  if (owner != nullptr)
-    owner->schedule(me);
-}
-
-void Agent::clearEvents()
-{
-  Agent *owner = !isinf(_time) ? _owner : nullptr;
-  PEvent me;
-  if (owner != nullptr) {
-    me = _pos->second;
-    owner->unschedule(me);
-  }
-  for (auto e : _events)
-    e.second->_owner = NULL;
-  _events.clear();
-  _time = R_PosInf;
-  if (owner != nullptr)
-    owner->schedule(me);
+  schedule(std::make_shared<DeathEvent>(time));
 }
 
 static State empty_state;
@@ -105,9 +70,12 @@ void Agent::report()
 CharacterVector Agent::classes = CharacterVector::create("Agent", "Event");
 
 // [[Rcpp::export]]
-XP<Agent> newAgent(Nullable<List> state)
+XP<Agent> newAgent(Nullable<List> state, NumericVector death_time = NA_REAL)
 {
-  return XP<Agent>(std::make_shared<Agent>(state));
+  XP<Agent> a = (std::make_shared<Agent>(state));
+  double d = as<double>(death_time);
+  if (!isnan(d)) a->setDeathTime(d);
+  return a;
 }
   
 // [[Rcpp::export]]
@@ -149,6 +117,20 @@ XP<Agent> setState(XP<Agent> agent, SEXP value)
   Nullable<List> s(value);
   if (!s.isNull())
     agent->set(s.as());
+  return agent;
+}
+
+// [[Rcpp::export]]
+XP<Agent> leave(XP<Agent> agent)
+{
+  agent->leave();
+  return agent;
+}
+
+// [[Rcpp::export]]
+XP<Agent> setDeathTime(XP<Agent> agent, double time)
+{
+  agent->setDeathTime(time);
   return agent;
 }
 
