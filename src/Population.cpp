@@ -39,34 +39,22 @@ Population::Population(List states)
 void Population::add(PAgent agent)
 {
   if (agent->_population == this) return;
-  if (_available.empty()) {
-    _agents.push_back(agent);
-    agent->_id = _agents.size();
-  } else {
-    size_t id = *_available.begin();
-    agent->_id = id;
-    _available.erase(_available.begin());
-    _agents[id - 1] = agent;
-  }
+  agent->_index = _agents.size();
+  _agents.push_back(agent);
   schedule(agent);
   agent->_population = this;
   agent->report();
   for (auto c : _contacts)
-    c->add(agent);
+    c->add(*agent);
+  Simulation *sim = simulation();
+  if (agent->_id == 0 && sim) agent->attached(*sim);
 }
 
 void Population::add(PContact contact)
 {
   _contacts.push_back(contact);
   for (auto &a : _agents)
-    contact->add(a);
-}
-
-PAgent Population::agentAtIndex(size_t i) const
-{
-  for (auto a : _available)
-    if (a - 1 <= i) ++i;
-  return _agents[i];
+    contact->add(*a);
 }
 
 void Population::report()
@@ -78,18 +66,33 @@ void Population::report()
     a->report();
 }
 
-void Population::remove(Agent &agent)
+PAgent Population::remove(Agent &agent)
 {
-  if (agent._population == this) {
-    for (auto &c : _contacts)
-      c->remove(agent);
-    size_t id = agent._id;
-    agent._contactEvents->clearEvents();
-    agent._population = nullptr;
-    _available.insert(id);
-    unschedule(_agents[id - 1]);
-    _agents[id - 1]= nullptr;
-  }
+  if (agent._population != this) 
+    return NULL;
+  for (auto &c : _contacts)
+    c->remove(agent);
+  agent._contactEvents->clearEvents();
+  agent._population = nullptr;
+  unsigned int i = agent._index;
+  agent._index = 0;
+  size_t n = _agents.size();
+  PAgent a = _agents[i];
+  if (n > 1 && i < n - 1) {
+    _agents[i] = _agents[n - 1];
+    _agents[n - 1] = nullptr;
+    _agents[i]->_index = i;
+  } else _agents[i]= nullptr;
+  _agents.resize(n - 1);
+  unschedule(a);
+  return a;
+}
+
+void Population::attached(Simulation &sim)
+{
+  Agent::attached(sim);
+  for (auto &a : _agents)
+    a->attached(sim);
 }
 
 CharacterVector Population::classes = CharacterVector::create("Population", "Agent", "Event");
@@ -109,10 +112,9 @@ XP<Population> newPopulation(SEXP n, Nullable<Function> initializer = R_NilValue
 }
 
 // [[Rcpp::export]]
-XP<Population> addAgent(XP<Population> population, XP<Agent> agent)
+void addAgent(XP<Population> population, XP<Agent> agent)
 {
   population->add(agent);
-  return population;
 }
 
 // [[Rcpp::export]]
@@ -128,14 +130,13 @@ XP<Agent> getAgent(XP<Population> population, int i)
 }
 
 // [[Rcpp::export]]
-XP<Population> addContact(XP<Population> population, XP<Contact> contact)
+void addContact(XP<Population> population, XP<Contact> contact)
 {
   population->add(contact);
-  return population;
 }
 
 // [[Rcpp::export]]
-XP<Population> setStates(XP<Population> population, SEXP states)
+void setStates(XP<Population> population, SEXP states)
 {
   if (Rf_isFunction(states)) {
     Function f(states);
@@ -154,6 +155,5 @@ XP<Population> setStates(XP<Population> population, SEXP states)
       population->agentAtIndex(i)->set(s);
     }
   } else stop("invalid states. Must be a function or a list");
-  return population;
 }
 

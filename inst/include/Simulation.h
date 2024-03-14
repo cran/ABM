@@ -89,7 +89,22 @@ public:
   void add(Transition *rule);
   
   using Population::add;
+
+  /**
+   * Get the next unique ID in the simulation
+   * 
+   * @return the next ID, an unsigned integer
+   * 
+   * @details the first ID is 1, and each call to this method will increase by 1.
+   */
+  unsigned int nextID() { return ++_next_id; }
+
+  /** the simulation that it is in */
+  virtual Simulation *simulation();
+  /** the simulation that it is in */
+  virtual const Simulation *simulation() const;
   
+
   static Rcpp::CharacterVector classes;
   
 protected:
@@ -105,4 +120,9 @@ protected:
   std::list<std::shared_ptr<Logger> > _loggers;
   std::list<Transition*> _rules;
   double _current_time;
+  
+  /**
+   * The next unique ID
+   */
+  unsigned int _next_id;
 };

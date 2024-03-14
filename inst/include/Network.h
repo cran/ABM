@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Contact.h"
+#include "RNG.h"
 
 class Network : public Contact {
 public:
@@ -23,14 +24,14 @@ public:
    * 
    * @return a vector of shared_ptr<Agent> that holds the contacts
    */
-  virtual const std::vector<PAgent> &contact(double time, Agent &agent);
+  virtual const std::vector<Agent*> &contact(double time, Agent &agent);
   
   /** 
    * Add an agent to the contact pattern
    * 
    * @param agent the agent to add
    */
-  virtual void add(const PAgent &agent);
+  virtual void add(Agent &agent);
   
   /**
    * remove an agent
@@ -61,7 +62,7 @@ protected:
    * @details When the network has been finalized, if an agent is added, then
    * this method is called to grow the network and accommodate the new agent.
    */ 
-  virtual void grow(const PAgent &agent) = 0;
+  virtual void grow(Agent &agent) = 0;
 
   /**
    * Connect two nodes
@@ -77,7 +78,7 @@ protected:
   /**
    * The array of neighbors for each node.
    */
-  std::vector<std::vector<PAgent> > _neighbors;
+  std::vector<std::vector<Agent*> > _neighbors;
 };
 
 /**
@@ -113,7 +114,8 @@ protected:
    * @details When the network has been finalized, if an agent is added, then
    * this method is called to grow the network and accommodate the new agent.
    */  
-  virtual void grow(const PAgent &agent);
+  virtual void grow(Agent &agent);
   
   Rcpp::Function _rng;
+  RUnif _unif;
 }; 

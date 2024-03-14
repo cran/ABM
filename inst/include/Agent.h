@@ -4,6 +4,7 @@
 #include "State.h"
 #include <map>
 
+class Simulation;
 class Population;
 class ContactTransition;
 
@@ -24,6 +25,8 @@ class ContactTransition;
  */
 class Agent : public Calendar {
 public:
+  typedef unsigned long IDType;
+  typedef unsigned int IndexType;
   /**
    * Constructor that creates an agent with a given state
    * 
@@ -35,7 +38,12 @@ public:
   /**
    * Returns the agent id (a long value)
    */
-  unsigned long id() const { return _id; }
+  IDType id() const { return _id; }
+
+  /**
+   * Returns the index of the agent in the population
+   */
+  IndexType index() const { return _index; }
 
   /**
    * Handle the agent as an event
@@ -85,7 +93,7 @@ public:
    * 
    * @details after calling this function, the agent is not in any population
    */
-  virtual void leave();
+  virtual PAgent leave();
   
   /**
    * set the time of death for the agent
@@ -98,8 +106,14 @@ public:
 
   /** the population that it is in */
   Population *population() { return _population; }
+  /** the population that it is in */
   const Population *population() const { return _population; }
 
+  /** the simulation that it is in */
+  virtual Simulation *simulation();
+  /** the simulation that it is in */
+  virtual const Simulation *simulation() const;
+  
   static Rcpp::CharacterVector classes;
 
 protected:
@@ -113,15 +127,32 @@ protected:
    */
   virtual void stateChanged(Agent &agent, const State &from);
 
+  /**
+   * getting noticed that the agent is added to a simulation
+   */
+  virtual void attached(Simulation &sim);
+  
+  /**
+   * The population that the agent is in
+   */
   Population *_population;
 
 private:
+  friend class Simulation; // so that Simulation can call attached
   friend class Population;
   friend class ContactTransition;
   /**
-   * The agent id, i.e., the order in the population
+   * The agent id, which is unique in the simulation. 
+   * 
+   * This id is assigned when the agent is attached to the simulation
    */
-  unsigned long _id;
+  IDType _id;
+  /**
+   * The index in the population's agent list
+   * 
+   * This index is assigned when the agent is attached to the population
+   */
+  IndexType _index;
   /**
    * The state of the agent
    */

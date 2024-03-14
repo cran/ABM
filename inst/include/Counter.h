@@ -51,7 +51,7 @@ protected:
 };
 
 /**
- * A logger that ccounts the number of specific stqte transitions
+ * A logger that counts the number of specific state transitions
  */
 class Counter : public Logger {
 public:
@@ -161,7 +161,7 @@ protected:
    * the agent whose state will be logged. If R_NilValue, then
    * the current agent whose state has changed will be logged.
    */
-  PAgent _agent;
+  std::weak_ptr<Agent> _agent;
   /**
    * the namme of the state to be logged.
    */

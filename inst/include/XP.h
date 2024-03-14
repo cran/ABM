@@ -131,7 +131,7 @@ public:
   /**
    * converts to a normal C++ pointer
    */
-  operator T*() { return this->get(); }
+  operator T*() { return *this->get(); }
   
   /**
    * converts to a shared_ptr

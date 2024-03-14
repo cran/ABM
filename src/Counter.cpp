@@ -44,7 +44,8 @@ StateLogger::StateLogger(const std::string &name, PAgent agent, const std::strin
 
 void StateLogger::log(const Agent &agent, const State &from_state)
 {
-  const Agent &a = (_agent) ? *_agent : agent;
+  PAgent pa = _agent.lock();
+  const Agent &a = pa ? *pa : agent;
   _value = as<double>(a.state()[_state]);
 }
 
@@ -62,10 +63,8 @@ XP<Counter> newCounter(std::string name, List from, Nullable<List> to=R_NilValue
 // [[Rcpp::export]]
 XP<StateLogger> newStateLogger(std::string name, Nullable<XP<Agent> > agent, std::string state)
 {
-  std::shared_ptr<Agent> pa;
-  if (!agent.isNull()) {
-    pa = agent.as();
-  }
+  PAgent pa;
+  if (agent.isNotNull()) pa = agent.as();
   return std::make_shared<StateLogger>(name, pa, state);
 }
 

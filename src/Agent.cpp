@@ -14,7 +14,7 @@ public:
 };
 
 Agent::Agent(Nullable<List> state)
-  : Calendar(), _population(nullptr), _contactEvents(new Calendar)
+  : Calendar(), _population(nullptr), _id(0), _index(0), _contactEvents(new Calendar)
 {
   if (state != R_NilValue) _state &= state.as();
   schedule(_contactEvents);
@@ -44,15 +44,32 @@ void Agent::stateChanged(Agent &agent, const State &from)
     _population->stateChanged(agent, from);
 }
 
-void Agent::leave()
+PAgent Agent::leave()
 {
-  if (_population != nullptr) {
-    State save = _state;
-    _state = State();
-    stateChanged(*this, save);
-    _population->remove(*this);
-    _state = save;
-  }
+  if (_population == nullptr) 
+    return nullptr;
+  State save = _state;
+  _state = State();
+  stateChanged(*this, save);
+  PAgent agent = _population->remove(*this);
+  _state = save;
+  return agent;
+}
+
+void Agent::attached(Simulation &sim)
+{
+  if (_id == 0)
+    _id = sim.nextID();
+}
+
+Simulation *Agent::simulation()
+{
+  return _population == nullptr ? nullptr : _population->simulation();
+}
+
+const Simulation *Agent::simulation() const
+{
+  return _population == nullptr ? nullptr : _population->simulation();
 }
 
 void Agent::setDeathTime(double time)
@@ -91,46 +108,40 @@ List getState(XP<Agent> agent)
 }
   
 // [[Rcpp::export]]
-XP<Agent> schedule(XP<Agent> agent, XP<Event> event)
+void schedule(XP<Agent> agent, XP<Event> event)
 {
   agent->schedule(event);
-  return agent;
 }
 
 // [[Rcpp::export]]
-XP<Agent> unschedule(XP<Agent> agent, XP<Event> event)
+void unschedule(XP<Agent> agent, XP<Event> event)
 {
   agent->unschedule(event);
-  return agent;
 }
 
 // [[Rcpp::export]]
-XP<Agent> clearEvents(XP<Agent> agent)
+void clearEvents(XP<Agent> agent)
 {
   agent->clearEvents();
-  return agent;
 }
 
 // [[Rcpp::export]]
-XP<Agent> setState(XP<Agent> agent, SEXP value)
+void setState(XP<Agent> agent, SEXP value)
 {
   Nullable<List> s(value);
   if (!s.isNull())
     agent->set(s.as());
-  return agent;
 }
 
 // [[Rcpp::export]]
 XP<Agent> leave(XP<Agent> agent)
 {
-  agent->leave();
-  return agent;
+  return agent->leave();
 }
 
 // [[Rcpp::export]]
-XP<Agent> setDeathTime(XP<Agent> agent, double time)
+void setDeathTime(XP<Agent> agent, double time)
 {
   agent->setDeathTime(time);
-  return agent;
 }
 

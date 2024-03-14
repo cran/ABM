@@ -6,11 +6,15 @@ using namespace Rcpp;
 Simulation::Simulation(size_t n, Rcpp::Nullable<Rcpp::Function> initializer)
   : Population(n, initializer), _current_time(R_NaN)
 {
+  for (auto a : _agents)
+    a->attached(*this);
 }
 
 Simulation::Simulation(List states)
   : Population(states), _current_time(R_NaN)
 {
+  for (auto a : _agents)
+    a->attached(*this);
 }
 
 Simulation::~Simulation()
@@ -87,6 +91,16 @@ void Simulation::add(Transition *rule)
   }
 }
 
+Simulation *Simulation::simulation()
+{
+  return this;
+}
+
+const Simulation *Simulation::simulation() const
+{
+  return this;
+}
+
 CharacterVector Simulation::classes = CharacterVector::create("Simulation", "Population", "Agent", "Event");
 
 // [[Rcpp::export]]
@@ -117,14 +131,13 @@ List resumeSimulation(XP<Simulation> sim, NumericVector time)
 }
 
 // [[Rcpp::export]]
-XP<Simulation> addLogger(XP<Simulation> sim, XP<Logger> logger)
+void addLogger(XP<Simulation> sim, XP<Logger> logger)
 {
   sim->add(logger);
-  return sim;
 }
 
 // [[Rcpp::export]]
-XP<Simulation> addTransition(
+void addTransition(
     XP<Simulation> sim, 
     List from, Nullable<List> contact_from, 
     List to, Nullable<List> contact_to, Nullable<XP<Contact> > contact,
@@ -156,5 +169,4 @@ XP<Simulation> addTransition(
         from, contact_from.as(), to, contact_to.as(),
         **contact.as(), w, to_change_callback, changed_callback));
   }
-  return sim;
 }
