@@ -1,6 +1,6 @@
-154e0924bd73a59f2a2c83482dfb8141 *DESCRIPTION
+eb2c45d0f336e020694f681179b1c39a *DESCRIPTION
 9a55673e1cbda8d03e36bda3536ff9f3 *NAMESPACE
-b09a49f5310da811f20107c920f263ba *NEWS.md
+cbd05d7a5e2cbecf15c113ee4a78a3f9 *NEWS.md
 b587a9ebd22094d3dfaa8c1dff6da412 *R/ABM-package.R
 822297176c5f1131c7926911906e5a2f *R/Agent.R
 312a0f0edf20781b4aaf05a0f438c79b *R/Contact.R
@@ -22,7 +22,7 @@ ae641ded76a136cf1dddfd916e8519a7 *inst/include/Agent.h
 864df08fb419d3d8800020642af65a1c *inst/include/Simulation.h
 1bd20a9f0821f0f7825381a1487c4f17 *inst/include/State.h
 3acda3e9f10e604b5a3f6526e3188064 *inst/include/Transition.h
-6464dfaad2772043a251924d72b4b899 *inst/include/XP.h
+3f8abc0f2eb34f78470a673a10af7ae0 *inst/include/XP.h
 c5d330a0438315749ed111bd37630492 *man/ABM-package.Rd
 dd2d26403e9fccd5eca00d3b1c0356c4 *man/Agent.Rd
 ed2368bf11b7da0d193b43b338bf6463 *man/Contact.Rd
@@ -55,14 +55,14 @@ bce7e5b8ef0128c69db532d3d7364985 *man/schedule.Rd
 b8fdbc7dce13412e2f1707019dfd763a *man/setStates.Rd
 14754e6cd12af74f640d37f12f88366e *man/stateMatch.Rd
 dec2c4e25cf6f69d967aa3614c6e1d2f *man/unschedule.Rd
-bbd4d8fff5189dd064c4687405bfcb2f *src/Agent.cpp
+8edcff1d5e5ee78313c0d3c962f8ccf4 *src/Agent.cpp
 32ffbd616e2de7fb6eeb136824f4d755 *src/Contact.cpp
 9d88e894a9204234b0eafeee0116bda3 *src/Counter.cpp
-91701016bcadc47c57e24da634eb18a5 *src/Event.cpp
+bd687bd87d685fd6839abb3e8d55b229 *src/Event.cpp
 34a3429a3f73bbea95282db10ccc4535 *src/Network.cpp
 77b69dc927eb8b22aa13b4c669f847d8 *src/Population.cpp
-ff908da219c2486a5bcd2b3d2c65c946 *src/RNG.cpp
+c4e4e3509c7c1f746c12887d2971d911 *src/RNG.cpp
 d5fc336948b84d58b8f8e819b46fb854 *src/RcppExports.cpp
-94a9780d92ee669b3d5d775f139f0f4a *src/Simulation.cpp
+8b3184787c18444023871f7d66a330ac *src/Simulation.cpp
 dc8f31ce12a3f8ed0c22878eb4cdfb13 *src/State.cpp
-5a8c654edf9ddcfca4a8e2a35cde936d *src/Transition.cpp
+5a9d9563b2d77c097e938fa5d72e1339 *src/Transition.cpp

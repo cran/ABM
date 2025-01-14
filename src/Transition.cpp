@@ -84,9 +84,10 @@ void Transition::changed(double time, Agent &agent)
 
 void Transition::schedule(double time, Agent &agent)
 {
-  double t = _waiting_time->waitingTime(time) + time;
-  PRINT("%lf, %lf, %ld, NA, NA\n", time, t, agent.id());
-  agent.schedule(std::make_shared<TransitionEvent>(t, *this));
+  double wait_time = _waiting_time->waitingTime(time);
+  PRINT("%lf, %lf, %ld, NA, NA\n", time, wait_time, agent.id());
+  if (wait_time < R_PosInf)
+    agent.schedule(std::make_shared<TransitionEvent>(time + wait_time, *this));
 }
 
 ContactEvent::ContactEvent(double time, PAgent contact, ContactTransition &rule)
@@ -153,9 +154,11 @@ void ContactTransition::schedule(double time, Agent &agent)
       next_contact = c;
     }
   }
-  PRINT("%lf, %lf, %ld, %ld, NA\n", time, waiting_time+time, agent.id(), next_contact->id());
-  agent._contactEvents->schedule(std::make_shared<ContactEvent>(
-      waiting_time + time, next_contact->population()->agent(*next_contact), *this));
+  if (waiting_time < R_PosInf) {
+    PRINT("%lf, %lf, %ld, %ld, NA\n", time, waiting_time+time, agent.id(), next_contact->id());
+    agent._contactEvents->schedule(std::make_shared<ContactEvent>(
+        waiting_time + time, next_contact->population()->agent(*next_contact), *this));
+  }
 }
 
 ExpWaitingTime::ExpWaitingTime(double rate)

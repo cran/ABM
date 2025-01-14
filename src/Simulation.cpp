@@ -1,5 +1,5 @@
 #include "../inst/include/Simulation.h"
-#include <math.h>
+#include <cmath>
 
 using namespace Rcpp;
 
@@ -43,9 +43,9 @@ List Simulation::resume(const NumericVector &time)
     result[c->name()] = NumericVector(n);
   size_t i = 0;
   for (auto report : time) {
-    while (report > _current_time) {
-      this->handle(*this, *this);
+    while (report > _time) {
       _current_time = _time;
+      this->handle(*this, *this);
     }
     for (auto c : _loggers)
       result[c->name()][i] = c->report();
@@ -60,7 +60,7 @@ List Simulation::resume(const NumericVector &time)
 
 void Simulation::stateChanged(Agent &agent, const State &from)
 {
-  if (!isnan(_current_time)) {
+  if (!std::isnan(_current_time)) {
     for (auto c : _loggers)
       c->log(agent, from);
     for (auto r : _rules) {
