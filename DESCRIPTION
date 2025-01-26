@@ -1,8 +1,8 @@
 Type: Package
 Package: ABM
 Title: Agent Based Model Simulation Framework
-Version: 0.4.2
-Date: 2025-01-14
+Version: 0.4.3
+Date: 2025-01-25
 Authors@R: 
     person("Junling", "Ma", , "junlingm@uvic.ca", role = c("aut", "cre"))
 Description: A high-performance, flexible and extensible framework to
@@ -37,8 +37,8 @@ LinkingTo: Rcpp
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 NeedsCompilation: yes
-Packaged: 2025-01-14 23:02:26 UTC; jma
+Packaged: 2025-01-26 00:57:07 UTC; jma
 Author: Junling Ma [aut, cre]
 Maintainer: Junling Ma <junlingm@uvic.ca>
 Repository: CRAN
-Date/Publication: 2025-01-14 23:10:01 UTC
+Date/Publication: 2025-01-26 04:30:02 UTC
